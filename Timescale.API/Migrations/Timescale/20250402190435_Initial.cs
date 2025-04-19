@@ -4,10 +4,8 @@
 
 namespace Timescale.API.Migrations.Timescale
 {
-    /// <inheritdoc />
     public partial class Initial : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -36,56 +34,72 @@ namespace Timescale.API.Migrations.Timescale
                 table: "VehicleTelemetries",
                 columns: new[] { "VehicleId", "Timestamp" },
                 descending: new[] { false, true });
-            
-            
-            migrationBuilder.Sql(
-                "SELECT create_hypertable( '\"VehicleTelemetries\"', by_range('Timestamp', INTERVAL '1 day'));"
-            );
-            migrationBuilder.Sql(
-                "SELECT add_retention_policy( '\"VehicleTelemetries\"', INTERVAL '1 month');"
-            );
-            
-            // Enable compression with specific settings
-            migrationBuilder.Sql(
-                "ALTER TABLE \"VehicleTelemetries\" SET (timescaledb.compress, timescaledb.compress_segmentby = '\"VehicleId\"', timescaledb.compress_orderby = '\"Timestamp\" DESC');"
-            );
-            
-            // Add compression policy (compress data older than 1 day)
-            migrationBuilder.Sql(
-                "SELECT add_compression_policy('\"VehicleTelemetries\"', INTERVAL '1 day', if_not_exists => true);"
-            );
+
+            // Make VehicleTelemetries a hypertable
+            migrationBuilder.Sql("""
+                SELECT create_hypertable(
+                    '"VehicleTelemetries"',
+                    'Timestamp',
+                    chunk_time_interval => INTERVAL '1 month',
+                    if_not_exists => true
+                );
+            """);
+
+            // Add retention policy
+            migrationBuilder.Sql("""
+                SELECT add_retention_policy(
+                    '"VehicleTelemetries"',
+                    INTERVAL '1 year',
+                    if_not_exists => true
+                );
+            """);
+
+            // Enable compression
+            migrationBuilder.Sql("""
+                ALTER TABLE "VehicleTelemetries"
+                SET (
+                    timescaledb.compress,
+                    timescaledb.compress_segmentby = '"VehicleId"',
+                    timescaledb.compress_orderby = '"Timestamp" DESC'
+                );
+            """);
+
+            // Add compression policy
+            migrationBuilder.Sql("""
+                SELECT add_compression_policy(
+                    '"VehicleTelemetries"',
+                    INTERVAL '7 days',
+                    if_not_exists => true
+                );
+            """);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "VehicleTelemetries");
-
-            migrationBuilder.Sql(
-                """
-                DO
-                $do$
-                    BEGIN
-                        IF (select to_regclass('"VehicleTelemetries"') is not null) THEN
-                            PERFORM remove_retention_policy('"VehicleTelemetries"', if_exists := true);
-                        ELSE
-                            PERFORM 'NOOP' as Noop;
-                        END IF;
-                    END
-                $do$
-                """
-            );
-            
-            // Remove compression policy first
-            migrationBuilder.Sql(
-                "SELECT remove_compression_policy('\"VehicleTelemetries\"', if_exists => true);"
-            );
+            // Remove compression policy
+            migrationBuilder.Sql("""
+                DO $$
+                BEGIN
+                    IF to_regclass('"VehicleTelemetries"') IS NOT NULL THEN
+                        PERFORM remove_compression_policy('"VehicleTelemetries"', if_exists => true);
+                    END IF;
+                END
+                $$;
+            """);
 
             // Remove retention policy
-            migrationBuilder.Sql(
-                "DO $$ BEGIN IF (select to_regclass('\"VehicleTelemetries\"') is not null) THEN PERFORM remove_retention_policy('\"VehicleTelemetries\"', if_exists := true); END IF; END $$;"
-            );
+            migrationBuilder.Sql("""
+                DO $$
+                BEGIN
+                    IF to_regclass('"VehicleTelemetries"') IS NOT NULL THEN
+                        PERFORM remove_retention_policy('"VehicleTelemetries"', if_exists => true);
+                    END IF;
+                END
+                $$;
+            """);
+
+            // Drop table (handled by EF Core with correct casing)
+            migrationBuilder.DropTable(name: "VehicleTelemetries");
         }
     }
 }
