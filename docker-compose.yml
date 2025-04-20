@@ -1,0 +1,23 @@
+name: timescale-telemetry-demo
+
+services:
+    timescale:
+        image: timescale/timescaledb-ha:pg17
+        container_name: timescale
+        restart: always
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=password
+
+    
+    elasticsearch:
+        image: elasticsearch:8.18.0
+        container_name: elasticsearch
+        restart: always
+        ports:
+            - "9200:9200"
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false

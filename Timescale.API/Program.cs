@@ -13,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<NativePostgresDbContext>(opt =>
 {
     opt.UseNpgsql("Host=localhost;Database=Shared_Native;Username=postgres;Password=password");
-    opt.EnableSensitiveDataLogging();
     opt.LogTo(
         (eventData) =>
         {
@@ -29,7 +28,6 @@ builder.Services.AddDbContext<NativePostgresDbContext>(opt =>
 builder.Services.AddDbContext<TimescaleDbContext>(opt =>
 {
     opt.UseNpgsql("Host=localhost;Database=Shared_Timescale;Username=postgres;Password=password");
-    opt.EnableSensitiveDataLogging();
     opt.LogTo(
         (eventData) =>
         {
