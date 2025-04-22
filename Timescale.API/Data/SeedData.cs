@@ -24,14 +24,12 @@ public static class SeedData
 
     public static IEnumerable<VehicleTelemetry> Generate()
     {
+        var startDate = DateTime.UtcNow.AddYears(-1);
+        var increment = TimeSpan.FromSeconds(86400.0 / 1000000);
+
         var faker = new Faker<VehicleTelemetry>()
-            .RuleFor(f => f.Timestamp, (f, vt) =>
-            {
-                // Start from 1 day ago
-                var startDate = DateTime.UtcNow.AddYears(-1);
-                var increment = TimeSpan.FromSeconds(86400.0 / 1000000);
-                return startDate.Add(increment * f.IndexFaker);
-            })
+            .RuleFor(f => f.Timestamp,
+                (f, vt) => startDate.AddMonths(Random.Shared.Next(0, 11)).Add(increment * f.IndexFaker))
             .RuleFor(f => f.VehicleId, f => f.PickRandom(VehicleIds))
             .RuleFor(f => f.Latitude, f => f.Random.Double(-90, 90))
             .RuleFor(f => f.Longitude, f => f.Random.Double(-180, 180))

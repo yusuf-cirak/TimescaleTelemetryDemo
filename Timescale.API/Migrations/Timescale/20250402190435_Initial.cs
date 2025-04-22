@@ -41,7 +41,8 @@ namespace Timescale.API.Migrations.Timescale
                     '"VehicleTelemetries"',
                     'Timestamp',
                     chunk_time_interval => INTERVAL '1 month',
-                    if_not_exists => true
+                    if_not_exists => true,
+                    migrate_data => true
                 );
             """);
 
