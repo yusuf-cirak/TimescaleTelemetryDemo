@@ -71,7 +71,7 @@ namespace Timescale.API.Migrations.Timescale
             migrationBuilder.Sql("""
                 SELECT add_compression_policy(
                     '"VehicleTelemetries"',
-                    INTERVAL '7 days',
+                    INTERVAL '2 months',
                     if_not_exists => true
                 );
             """);
