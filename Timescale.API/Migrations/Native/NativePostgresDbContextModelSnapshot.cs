@@ -69,17 +69,11 @@ namespace Timescale.API.Migrations.Native
 
                     b.ToTable((string)null);
 
-                    b.ToView("vehicle_hourly_stats", (string)null);
+                    b.ToView("VehicleHourlyStats", (string)null);
                 });
 
             modelBuilder.Entity("Timescale.API.Models.VehicleTelemetry", b =>
                 {
-                    b.Property<string>("VehicleId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<double?>("BatteryVoltage")
                         .HasColumnType("double precision");
 
@@ -107,7 +101,15 @@ namespace Timescale.API.Migrations.Native
                     b.Property<double?>("Speed")
                         .HasColumnType("double precision");
 
-                    b.HasKey("VehicleId", "Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VehicleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasIndex("VehicleId", "Timestamp")
+                        .IsDescending(false, true);
 
                     b.ToTable("VehicleTelemetries");
                 });

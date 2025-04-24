@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Timescale.API.Data;
 
 #nullable disable
 
-namespace Timescale.API.Migrations.Timescale
+namespace Timescale.API.Migrations.Native
 {
-    [DbContext(typeof(TimescaleDbContext))]
-    partial class TimescaleDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(NativePostgresDbContext))]
+    [Migration("20250423191256_Remove_PK")]
+    partial class Remove_PK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -83,7 +83,7 @@ public static class SeedData
                 .Chunk(chunkSize)
                 .Select(chunk => elasticsearchClient.BulkAsync(b => b
                     .Index(VehicleTelemetry.IndexName)
-                    .IndexMany(chunk)
+                    .CreateMany(chunk)
                 ))
                 .ToList();
 

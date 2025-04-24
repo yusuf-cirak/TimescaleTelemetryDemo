@@ -31,6 +31,10 @@ namespace Timescale.API.Migrations.Native
                 FROM ""VehicleTelemetries""
                 GROUP BY date_trunc('hour', ""Timestamp""), ""VehicleId""
             ");
+            
+            migrationBuilder.Sql(@"
+            CREATE UNIQUE INDEX idx_vehicle_hourly_stats_vehicleid_timewindow ON ""VehicleHourlyStats"" (""VehicleId"", ""TimeWindow"");
+        ");
 
             // Create a function to refresh the materialized view
             migrationBuilder.Sql(@"

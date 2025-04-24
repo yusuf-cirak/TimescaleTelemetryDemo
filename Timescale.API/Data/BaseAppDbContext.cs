@@ -11,12 +11,16 @@ public abstract class BaseAppDbContext(DbContextOptions options) : DbContext(opt
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<VehicleTelemetry>(entity => { entity.HasKey(e => new { e.VehicleId, e.Timestamp }); });
+        modelBuilder.Entity<VehicleTelemetry>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.HasIndex(vt => new { vt.VehicleId, vt.Timestamp }).IsDescending(false, true);
+        });
 
         modelBuilder.Entity<VehicleHourlyStats>(entity =>
         {
             entity.HasNoKey();
-
             entity.ToView(nameof(VehicleHourlyStats));
         });
     }

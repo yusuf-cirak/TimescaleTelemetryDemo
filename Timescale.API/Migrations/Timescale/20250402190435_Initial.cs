@@ -42,7 +42,9 @@ namespace Timescale.API.Migrations.Timescale
                     'Timestamp',
                     chunk_time_interval => INTERVAL '1 month',
                     if_not_exists => true,
-                    migrate_data => true
+                    migrate_data => true,
+                    partitioning_column => 'VehicleId',
+                    number_partitions => 2 -- limit for space partitioning
                 );
             """);
 
