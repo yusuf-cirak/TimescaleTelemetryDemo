@@ -13,7 +13,7 @@ namespace Timescale.API.Migrations.Timescale
             // Create continuous aggregate view
             migrationBuilder.Sql(@"
                 CREATE MATERIALIZED VIEW ""VehicleHourlyStats""
-                WITH (timescaledb.continuous) AS
+                WITH (timescaledb.continuous,timescaledb.materialized_only=false) AS
                 SELECT 
                     time_bucket('1 hour', ""Timestamp"") as ""TimeWindow"",
                     ""VehicleId"",
@@ -37,9 +37,9 @@ namespace Timescale.API.Migrations.Timescale
             // Set refresh policy with minimum viable intervals
             migrationBuilder.Sql(@"
                 SELECT add_continuous_aggregate_policy('""VehicleHourlyStats""',
-                    start_offset => INTERVAL '12 hours',
-                    end_offset => INTERVAL '1 hour',
-                    schedule_interval => INTERVAL '5 minutes');
+                    start_offset => NULL,
+                    end_offset => NULL,
+                    schedule_interval => INTERVAL '1 minute');
             ");
 
             // Initial data population - executed outside transaction
